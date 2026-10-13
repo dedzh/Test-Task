@@ -1,30 +1,22 @@
-from app import db, es
+from app import db
 from app.elastic import add_to_index, delete_by_id, query_index_by_id, query_index_by_text
 
 
 async def search(Model, text):
-    if not es.indices.exists(index='docs'):
-        for post in Model.query.all():
-            add_to_index('docs', post)
-
     if text is None or not str(text).strip():
         return []
-
     try:
         ids = query_index_by_text('docs', text)
         if not ids:
             return []
-        result = Model.query.filter(Model.id.in_(ids)).order_by(Model.created_date.desc()).all()
+        result = Model.query.filter(Model.id.in_(ids))\
+            .order_by(Model.created_date.desc()).all()
         return [post.as_dict() for post in result]
     except Exception as exc:
         return str(exc)
 
 
 async def delete(Model, id):
-    if not es.indices.exists(index='docs'):
-        for post in Model.query.all():
-            add_to_index('docs', post)
-
     try:
         post_id = int(id)
     except (TypeError, ValueError):

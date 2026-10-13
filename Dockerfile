@@ -1,19 +1,19 @@
-FROM python:3.10.0-alpine
+FROM python:3.10-slim
 
-RUN adduser -D sudden
+RUN useradd -m sudden
 
 WORKDIR /home/sudden
 
 COPY requirements.txt requirements.txt
-RUN python -m venv venv
-RUN venv/bin/pip install -r requirements.txt
-RUN venv/bin/pip install gunicorn
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir gunicorn
 
 COPY app app
-COPY server.py config.py app.db boot.sh ./
+COPY server.py config.py boot.sh posts.csv ./
 RUN chmod +x boot.sh
 
-ENV FLASK_APP server.py
+ENV FLASK_APP=server.py
+ENV ES_HOST=http://elastic:9200
 
 RUN chown -R sudden:sudden ./
 USER sudden

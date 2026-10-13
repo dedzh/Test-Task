@@ -1,9 +1,10 @@
-alembic==1.13.2
-elastic-transport==8.13.1
 elasticsearch==8.13.1
+elastic-transport==8.13.1
 Flask==3.0.3
-Flask-Migrate==4.0.7
 Flask-SQLAlchemy==3.1.1
-greenlet==3.0.3
 SQLAlchemy==2.0.31
 Werkzeug==3.0.3
+greenlet==3.0.3
+
+pytest==8.3.2
+pytest-asyncio==0.23.8
