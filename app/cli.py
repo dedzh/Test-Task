@@ -1,4 +1,3 @@
-import ast
 import csv
 import os
 
@@ -17,7 +16,9 @@ def load_data(csv_path):
         click.echo(f"CSV not found: {csv_path}")
         return
 
-    # если данные уже загружены — не дублируем
+    # ВАЖНО: создаём таблицы, если их нет
+    db.create_all()
+
     if Docs.query.count() > 0:
         click.echo(f"DB already has {Docs.query.count()} docs, skipping load")
     else:
@@ -36,7 +37,6 @@ def load_data(csv_path):
             db.session.commit()
             click.echo(f"Loaded {count} docs into DB")
 
-    # индекс ES
     ensure_index("docs")
 
     already_indexed = es.count(index="docs")["count"]
@@ -46,6 +46,5 @@ def load_data(csv_path):
 
     for doc in Docs.query.all():
         add_to_index("docs", doc)
-    # refresh, чтобы документы сразу были видны
     es.indices.refresh(index="docs")
     click.echo(f"Indexed {Docs.query.count()} docs into ES")
